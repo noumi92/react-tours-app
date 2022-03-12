@@ -1,25 +1,42 @@
-import logo from './logo.svg';
-import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import {Button} from 'react-bootstrap';
+import React, {useState, useEffect} from 'react'
+import Loader from './loader'
+import Tours from './tours'
+const url = "https://course-api.com/react-tours-project"
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+const App = () => {
+    const [isLoading, setIsLoading] = useState(true)
+    const [tours, setTours] = useState([])
+    const getTours = async ()=>{
+        setIsLoading(true)
+        const response = await fetch(url);
+        const tours = await response.json();
+        setTours(tours)
+        setIsLoading(false)
+        console.log(tours)
+    }
+    const removeTour = (id)=>{
+        const singleTour = tours.filter((tour)=>tour.id !== id)
+        setTours(singleTour)
+    }
+    useEffect(()=>{
+        getTours()
+    }, [])
+    if(isLoading){
+        return <Loader />
+    }
+    if(tours.length === 0){
+        return(
+            <Button className="reloadBtn" onClick={()=>getTours()}>Reload Tours</Button>
+        )
+    }
+    return(
+        <div><Tours tours={tours} removeTour={removeTour}/></div>
+    )
+        
+    
 }
 
-export default App;
+export default App
